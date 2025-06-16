@@ -1,0 +1,3700 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+    <title>Optimizemyhealth - Your Daily Stretching Companion</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+
+
+        /* Animation for water tracker */
+
+        @keyframes waterFill {
+
+            0% { transform: translateY(100%); }
+
+            100% { transform: translateY(0); }
+
+        }
+
+        
+
+        .water-fill {
+
+            animation: waterFill 0.5s ease-out forwards;
+
+        }
+
+        
+
+        /* Chart styling */
+
+        .chart-column {
+
+            flex: 1;
+
+            margin: 0 2px;
+
+            background-color: rgba(99, 102, 241, 0.2);
+
+            border-radius: 6px 6px 0 0;
+
+            transition: height 0.5s ease;
+
+            position: relative;
+
+            min-width: 12px;
+
+        }
+
+        .chart-column.active {
+
+            background-color: rgba(99, 102, 241, 0.5);
+
+        }
+
+        .chart-column::after {
+
+            content: attr(data-day);
+
+            position: absolute;
+
+            bottom: -20px;
+
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            font-size: 10px;
+
+            color: #6b7280;
+
+        }
+
+        
+
+        /* Modal transition */
+
+        .modal-enter {
+
+            opacity: 0;
+
+            transform: scale(0.95);
+
+        }
+
+        .modal-enter-active {
+
+            opacity: 1;
+
+            transform: scale(1);
+
+            transition: opacity 200ms, transform 200ms;
+
+        }
+
+        .modal-exit {
+
+            opacity: 1;
+
+        }
+
+        .modal-exit-active {
+
+            opacity: 0;
+
+            transform: scale(0.95);
+
+            transition: opacity 200ms, transform 200ms;
+
+        }
+
+        
+
+        /* Bottom navigation */
+
+        .bottom-nav {
+
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+
+        }
+
+         body {
+
+            padding-top: env(safe-area-inset-top);
+
+        }
+
+    </style>
+
+</head>
+
+<body class="bg-gray-50 font-sans pt-[env(safe-area-inset-top)]">
+
+    <div class="max-w-md mx-auto bg-white min-h-screen shadow-lg flex flex-col">
+
+        <!-- Header -->
+
+<header class="text-white px-4 pb--4 shadow-md fixed top-0 left-0 right-0 z-10" style="background-color: #2B71B7; height: calc(65px + env(safe-area-inset-top)); padding-top: env(safe-area-inset-top);">
+
+            <div class="flex justify-between items-center">
+
+                <img src="assets/logo.png" alt="Logo" class="h-8 w-auto">
+
+
+                <div class="flex space-x-4">
+
+                    <button id="streakBtn" class="flex items-center">
+
+                        <i class="fas fa-fire text-yellow-300 mr-1"></i>
+
+                        <span id="streakCount">0</span>
+
+                    </button>
+
+                    <button id="profileBtn">
+
+                        <i class="fas fa-user"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </header>
+
+        
+
+        <!-- Main Content -->
+
+       <div class="pt-[calc(20px+env(safe-area-inset-top))]">
+  <main class="p-4 flex-1 overflow-y-auto pb-20">
+
+
+            <!-- Home Tab Content -->
+
+            <div id="homeContent" class="tab-content">
+
+                <div class="bg-indigo-50 rounded-lg p-4 mb-6">
+
+                    <h2 class="text-lg font-semibold text-indigo-800 mb-2">Welcome back!</h2>
+
+                    <p class="text-gray-700">Keep up your stretching routine for better flexibility and reduced muscle tension.</p>
+
+                </div>
+
+                
+
+                <h3 class="text-lg font-semibold mb-3">Today's Recommended Routine</h3>
+
+                <div id="recommendedRoutine" class="bg-white rounded-lg shadow-md p-4 mb-3 border border-indigo-100 cursor-pointer transform transition hover:scale-[1.01]">
+
+                    <div class="flex justify-between items-center">
+
+                        <div>
+
+                            <h4 class="font-bold text-indigo-700">Morning Mobility</h4>
+
+                            <p class="text-sm text-gray-600">8 stretches • 15 minutes</p>
+
+                        </div>
+
+                        <button class="bg-indigo-600 text-white px-4 py-2 rounded-full text-sm font-medium">Start</button>
+
+                    </div>
+
+                </div>
+
+                
+
+                <div id="eveningRoutine" class="bg-white rounded-lg shadow-md p-4 mb-3 border border-blue-100 cursor-pointer transform transition hover:scale-[1.01]">
+
+                    <div class="flex justify-between items-center">
+
+                        <div>
+
+                            <h4 class="font-bold text-blue-700">Evening Relaxation</h4>
+
+                            <p class="text-sm text-gray-600">6 stretches • 12 minutes</p>
+
+                        </div>
+
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-medium">Start</button>
+
+                    </div>
+
+                </div>
+
+                
+
+                <div id="deskRoutine" class="bg-white rounded-lg shadow-md p-4 mb-6 border border-green-100 cursor-pointer transform transition hover:scale-[1.01]">
+
+                    <div class="flex justify-between items-center">
+
+                        <div>
+
+                            <h4 class="font-bold text-green-700">Desk Break</h4>
+
+                            <p class="text-sm text-gray-600">4 stretches • 8 minutes</p>
+
+                        </div>
+
+                        <button class="bg-green-600 text-white px-4 py-2 rounded-full text-sm font-medium">Start</button>
+
+                    </div>
+
+                </div>
+
+                
+
+                <h3 class="text-lg font-semibold mb-3">Quick Stretches</h3>
+
+                <div class="grid grid-cols-2 gap-3 mb-6">
+
+                    <div class="quick-stretch bg-white rounded-lg shadow p-3 border border-gray-100 cursor-pointer" data-stretch="neck">
+
+                        <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 mx-auto">
+
+                            <i class="fas fa-running text-blue-600"></i>
+
+                        </div>
+
+                        <p class="text-center font-medium text-sm">Neck Relief</p>
+
+                        <p class="text-center text-xs text-gray-500">3 min</p>
+
+                    </div>
+
+                    <div class="quick-stretch bg-white rounded-lg shadow p-3 border border-gray-100 cursor-pointer" data-stretch="shoulder">
+
+                        <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 mx-auto">
+
+                            <i class="fas fa-hands text-green-600"></i>
+
+                        </div>
+
+                        <p class="text-center font-medium text-sm">Shoulder Release</p>
+
+                        <p class="text-center text-xs text-gray-500">4 min</p>
+
+                    </div>
+
+                    <div class="quick-stretch bg-white rounded-lg shadow p-3 border border-gray-100 cursor-pointer" data-stretch="back">
+
+                        <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 mx-auto">
+
+                            <i class="fas fa-spa text-purple-600"></i>
+
+                        </div>
+
+                        <p class="text-center font-medium text-sm">Back Stretch</p>
+
+                        <p class="text-center text-xs text-gray-500">5 min</p>
+
+                    </div>
+
+                    <div class="quick-stretch bg-white rounded-lg shadow p-3 border border-gray-100 cursor-pointer" data-stretch="leg">
+
+                        <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 mx-auto">
+
+                            <i class="fas fa-walking text-yellow-600"></i>
+
+                        </div>
+
+                        <p class="text-center font-medium text-sm">Leg Loosener</p>
+
+                        <p class="text-center text-xs text-gray-500">4 min</p>
+
+                    </div>
+
+                </div>
+
+                
+
+                <h3 class="text-lg font-semibold mb-3">Daily Hydration</h3>
+
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-md p-4 mb-6 border border-blue-100">
+
+                    <div class="flex justify-between items-center mb-4">
+
+                        <div>
+
+                            <h4 class="font-semibold text-blue-800">Water Tracker</h4>
+
+                            <p class="text-xs text-blue-600">8 glasses recommended</p>
+
+                        </div>
+
+                        <span id="waterCount" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">0/8</span>
+
+                    </div>
+
+                    
+
+                    <div class="grid grid-cols-4 gap-3">
+
+                        <div class="drink-glass flex flex-col items-center" data-index="0">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="1">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="2">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="3">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="4">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="5">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="6">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                        <div class="drink-glass flex flex-col items-center" data-index="7">
+
+                            <div class="bg-white rounded-xl p-3 mb-1 shadow-sm border-2 border-blue-100 hover:border-blue-300 transition-all">
+
+                                <i class="fas fa-glass-water text-2xl text-gray-300"></i>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                </div>
+
+            </div>
+
+            
+
+            <!-- Library Tab Content -->
+
+            <div id="libraryContent" class="tab-content hidden pb-20">
+
+                <div class="flex justify-between items-center mb-4">
+
+                    <h3 class="text-lg font-semibold">All Routines</h3>
+
+                    <button id="createRoutineBtn" class="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm">
+
+                        <i class="fas fa-plus mr-1"></i>Create Routine
+
+                    </button>
+
+                </div>
+
+                <div class="space-y-3" id="routinesList">
+
+                    <div class="routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer" data-routine="morning">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <h4 class="font-bold text-indigo-700">Morning Mobility</h4>
+
+                                <p class="text-sm text-gray-600">8 stretches • 15 minutes • Full Body</p>
+
+                            </div>
+
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer" data-routine="evening">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <h4 class="font-bold text-indigo-700">Evening Relaxation</h4>
+
+                                <p class="text-sm text-gray-600">6 stretches • 12 minutes • Full Body</p>
+
+                            </div>
+
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer" data-routine="postWorkout">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <h4 class="font-bold text-indigo-700">Post-Workout Stretch</h4>
+
+                                <p class="text-sm text-gray-600">7 stretches • 14 minutes • Full Body</p>
+
+                            </div>
+
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer" data-routine="upperBody">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <h4 class="font-bold text-indigo-700">Upper Body Relief</h4>
+
+                                <p class="text-sm text-gray-600">5 stretches • 10 minutes • Upper Body</p>
+
+                            </div>
+
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer" data-routine="lowerBody">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <h4 class="font-bold text-indigo-700">Lower Body Flexibility</h4>
+
+                                <p class="text-sm text-gray-600">6 stretches • 12 minutes • Lower Body</p>
+
+                            </div>
+
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+
+                        </div>
+
+                    </div>
+
+                    <div class="routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer" data-routine="deskBreak">
+
+                        <div class="flex justify-between items-center">
+
+                            <div>
+
+                                <h4 class="font-bold text-indigo-700">Desk Break Quickie</h4>
+
+                                <p class="text-sm text-gray-600">4 stretches • 8 minutes • Upper Body</p>
+
+                            </div>
+
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <h3 class="text-lg font-semibold mt-8 mb-4">All Stretches</h3>
+
+                <div class="grid grid-cols-2 gap-3 mb-6" id="allStretchesContainer">
+
+                    <!-- Stretches will be populated by JavaScript -->
+
+                </div>
+
+
+
+                <!-- Create Routine Modal -->
+
+                <div id="createRoutineModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+
+                    <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+
+                        <div class="p-4 border-b flex justify-between items-center">
+
+                            <h3 class="text-lg font-bold text-indigo-700">Create New Routine</h3>
+
+                            <button id="closeCreateRoutineModal" class="text-gray-500">
+
+                                <i class="fas fa-times"></i>
+
+                            </button>
+
+                        </div>
+
+                        <div class="p-4 overflow-y-auto max-h-[60vh]">
+
+                            <div class="mb-4">
+
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Routine Name</label>
+
+                                <input type="text" id="routineNameInput" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <label class="block text-gray-700 text-sm font-medium mb-2">Select Stretches</label>
+
+                                <div class="space-y-2" id="availableStretchesList">
+
+                                    <!-- Stretches will be populated by JavaScript -->
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <div class="p-4 border-t flex justify-end">
+
+                            <button id="saveRoutineBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">
+
+                                Save Routine
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            
+
+            <!-- Progress Tab Content -->
+
+            <div id="progressContent" class="tab-content hidden">
+
+                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+
+                    <h3 class="text-xl font-bold mb-6 text-indigo-800">Your Wellness Journey</h3>
+
+                    
+
+                    <!-- Stats Overview -->
+
+                    <div class="grid grid-cols-2 gap-4 mb-8">
+
+                        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-xl p-4 text-center shadow-sm">
+
+                            <div class="flex items-center justify-center mb-2">
+
+                                <i class="fas fa-fire text-yellow-500 text-xl mr-2"></i>
+
+                            </div>
+
+                            <p class="text-xs text-indigo-600 mb-1">Current Streak</p>
+
+                            <p id="currentStreak" class="text-3xl font-extrabold text-indigo-800">0</p>
+
+                            <p class="text-xs text-indigo-500">days</p>
+
+                        </div>
+
+                        <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4 text-center shadow-sm">
+
+                            <div class="flex items-center justify-center mb-2">
+
+                                <i class="fas fa-calendar-check text-green-500 text-xl mr-2"></i>
+
+                            </div>
+
+                            <p class="text-xs text-green-600 mb-1">Total Sessions</p>
+
+                            <p id="totalSessions" class="text-3xl font-extrabold text-green-800">0</p>
+
+                            <p class="text-xs text-green-500">completed</p>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <!-- Activity Charts -->
+
+                    <div class="mb-8">
+
+                        <div class="flex justify-between items-center mb-4">
+
+                            <h4 class="font-semibold text-indigo-800">Stretching Activity</h4>
+
+                            <p id="weeklyMinutes" class="text-indigo-600 font-medium">0 min/week</p>
+
+                        </div>
+
+                        <div class="relative h-40">
+
+                            <div id="weeklyActivityChart" class="absolute inset-0 flex items-end">
+
+                                <!-- Columns will be added by JavaScript -->
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <div class="mb-8">
+
+                        <div class="flex justify-between items-center mb-4">
+
+                            <h4 class="font-semibold text-blue-800">Hydration</h4>
+
+                            <p id="hydrationAverage" class="text-blue-600 font-medium">0 avg/day</p>
+
+                        </div>
+
+                        <div class="relative h-40">
+
+                            <div id="hydrationChart" class="absolute inset-0 flex items-end">
+
+                                <!-- Columns will be added by JavaScript -->
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <!-- Focus Areas -->
+
+                    <div>
+
+                        <div class="flex justify-between items-center mb-4">
+
+                            <h4 class="font-semibold text-purple-800">Focus Areas</h4>
+
+                            <span class="text-xs text-gray-500">Last 30 days</span>
+
+                        </div>
+
+                        <div class="flex flex-wrap gap-3 mb-4">
+
+                            <div class="flex-1 min-w-32">
+
+                                <div class="flex justify-between mb-1">
+
+                                    <span class="text-xs font-medium text-indigo-600">Upper Body</span>
+
+                                    <span id="upper-percent" class="text-xs text-gray-500">0%</span>
+
+                                </div>
+
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+
+                                    <div class="bg-indigo-600 h-2 rounded-full" data-area="upper" style="width: 0%"></div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="flex-1 min-w-32">
+
+                                <div class="flex justify-between mb-1">
+
+                                    <span class="text-xs font-medium text-blue-600">Lower Body</span>
+
+                                    <span id="lower-percent" class="text-xs text-gray-500">0%</span>
+
+                                </div>
+
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+
+                                    <div class="bg-blue-600 h-2 rounded-full" data-area="lower" style="width: 0%"></div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="flex-1 min-w-32">
+
+                                <div class="flex justify-between mb-1">
+
+                                    <span class="text-xs font-medium text-green-600">Back</span>
+
+                                    <span id="back-percent" class="text-xs text-gray-500">0%</span>
+
+                                </div>
+
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+
+                                    <div class="bg-green-600 h-2 rounded-full" data-area="back" style="width: 0%"></div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="flex-1 min-w-32">
+
+                                <div class="flex justify-between mb-1">
+
+                                    <span class="text-xs font-medium text-purple-600">Full Body</span>
+
+                                    <span id="full-percent" class="text-xs text-gray-500">0%</span>
+
+                                </div>
+
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+
+                                    <div class="bg-purple-600 h-2 rounded-full" data-area="full" style="width: 0%"></div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    
+
+                    <!-- Recent Activity -->
+
+                    <div class="mt-8">
+
+                        <h4 class="font-semibold text-gray-700 mb-3">Recent Activity</h4>
+
+                        <div id="recentActivity" class="space-y-3">
+
+                            <!-- Activity items will be populated by JavaScript -->
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </main>
+
+    </main>
+    
+</div>
+
+
+        
+
+        <!-- Bottom Navigation -->
+
+        <nav class="bottom-nav fixed inset-x-0 bottom-0 bg-white pt-2 pb-8 px-4">
+            <div class="flex justify-around">
+
+
+                <button id="homeTab" class="tab-button active flex flex-col items-center px-4 py-2 text-indigo-600">
+
+                    <i class="fas fa-home text-xl mb-1"></i>
+
+                    <span class="text-xs">Home</span>
+
+                </button>
+
+                <button id="libraryTab" class="tab-button flex flex-col items-center px-4 py-2 text-gray-500">
+
+                    <i class="fas fa-book text-xl mb-1"></i>
+
+                    <span class="text-xs">Library</span>
+
+                </button>
+
+                <button id="progressTab" class="tab-button flex flex-col items-center px-4 py-2 text-gray-500">
+
+                    <i class="fas fa-chart-line text-xl mb-1"></i>
+
+                    <span class="text-xs">Progress</span>
+
+                </button>
+
+            </div>
+
+        </nav>
+
+        
+
+        <!-- Routine Modal -->
+
+        <div id="routineModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+
+            <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+
+                <div class="p-4 border-b flex justify-between items-center">
+
+                    <div>
+
+                        <h3 id="routineModalTitle" class="text-lg font-bold text-indigo-700">Morning Mobility</h3>
+
+                        <p id="routineStretchCount" class="text-sm text-gray-600">1 of 8</p>
+
+                    </div>
+
+                    <div class="flex items-center">
+
+                        <button id="deleteRoutineBtn" class="text-red-500 mr-3 hidden">
+
+                            <i class="fas fa-trash"></i>
+
+                        </button>
+
+                        <button id="closeRoutineModal" class="text-gray-500">
+
+                            <i class="fas fa-times"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="p-4 overflow-y-auto max-h-[60vh]">
+
+                    <div class="bg-gray-100 rounded-lg aspect-video mb-4 overflow-hidden">
+
+                        <iframe id="routineVideo" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Instructions</h4>
+
+                        <p id="routineInstructions" class="text-gray-700"></p>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Benefits</h4>
+
+                        <p id="routineBenefits" class="text-gray-700"></p>
+
+                    </div>
+
+                </div>
+
+                <div class="p-4 border-t flex justify-between">
+
+                    <button id="prevRoutineStretchBtn" class="text-indigo-600 font-medium">
+
+                        <i class="fas fa-arrow-left mr-1"></i> Previous
+
+                    </button>
+
+                    <button id="nextRoutineStretchBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">
+
+                        Next <i class="fas fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        
+
+        <!-- Stretch Session Modal -->
+
+        <div id="sessionModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+
+            <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+
+                <div class="p-4 border-b flex justify-between items-center">
+
+                    <div>
+
+                        <h3 id="sessionTitle" class="text-lg font-bold text-indigo-700">Neck Release</h3>
+
+                        <p id="sessionBodyPart" class="text-sm text-gray-600">Upper Body</p>
+
+                    </div>
+
+                    <div class="flex items-center">
+
+                        <span id="sessionTimer" class="bg-indigo-100 text-indigo-800 px-2 py-1 rounded text-sm font-medium mr-2">0:30</span>
+
+                        <button id="closeSessionModal" class="text-gray-500">
+
+                            <i class="fas fa-times"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="p-4 overflow-y-auto max-h-[60vh]">
+
+                    <div class="bg-gray-100 rounded-lg aspect-video mb-4 overflow-hidden">
+
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${routine.stretches[state.currentStretchIndex].videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Instructions</h4>
+
+                        <p id="sessionInstructions" class="text-gray-700">Sit or stand tall. Slowly tilt your head to the right, bringing your ear toward your shoulder. Hold for 15-30 seconds. Repeat on the left side.</p>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Benefits</h4>
+
+                        <p id="sessionBenefits" class="text-gray-700">Relieves tension in the neck and shoulders, improves range of motion, and reduces stiffness.</p>
+
+                    </div>
+
+                </div>
+
+                <div class="p-4 border-t flex justify-between">
+
+                    <button id="prevStretchBtn" class="text-indigo-600 font-medium">
+
+                        <i class="fas fa-arrow-left mr-1"></i> Previous
+
+                    </button>
+
+                    <button id="nextStretchBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium">
+
+                        Next <i class="fas fa-arrow-right ml-1"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        
+
+        <!-- Single Stretch Modal -->
+
+        <div id="stretchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+
+            <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+
+                <div class="p-4 border-b flex justify-between items-center">
+
+                    <div>
+
+                        <h3 id="stretchTitle" class="text-lg font-bold text-indigo-700">Stretch Name</h3>
+
+                        <p id="stretchDuration" class="text-sm text-gray-600">Duration</p>
+
+                    </div>
+
+                    <button id="closeStretchModal" class="text-gray-500">
+
+                        <i class="fas fa-times"></i>
+
+                    </button>
+
+                </div>
+
+                <div class="p-4 overflow-y-auto max-h-[60vh]">
+
+                    <div class="bg-gray-100 rounded-lg aspect-video mb-4 overflow-hidden">
+
+                        <iframe id="stretchVideo" width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Instructions</h4>
+
+                        <p id="stretchInstructions" class="text-gray-700"></p>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Benefits</h4>
+
+                        <p id="stretchBenefits" class="text-gray-700"></p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Profile Modal -->
+
+        <div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+
+            <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+
+                <div class="p-4 border-b flex justify-between items-center">
+
+                    <h3 class="text-lg font-bold text-indigo-700">Your Profile</h3>
+
+                    <button id="closeProfileModal" class="text-gray-500">
+
+                        <i class="fas fa-times"></i>
+
+                    </button>
+
+                </div>
+
+                <div class="p-4 overflow-y-auto">
+
+                    <div class="flex flex-col items-center mb-6">
+
+                        <div class="w-20 h-20 rounded-full bg-indigo-100 flex items-center justify-center mb-3">
+
+                            <i class="fas fa-user text-3xl text-indigo-600"></i>
+
+                        </div>
+
+                        <h4 class="text-lg font-semibold" id="userName">User Name</h4>
+
+                        <p class="text-sm text-gray-500" id="userEmail">user@example.com</p>
+
+                    </div>
+
+                    
+
+                    <div class="my-6 border-t pt-4">
+
+                        <p class="text-gray-600 text-sm mb-1">Account created on:</p>
+
+                        <p class="text-gray-800 font-medium">${new Date().toLocaleDateString()}</p>
+
+                    </div>
+
+                    
+
+                    <div class="border-t pt-4">
+
+                        <button id="logoutBtn" class="w-full text-left px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 transition">
+
+                            <i class="fas fa-sign-out-alt mr-2"></i> Sign Out
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Quick Stretch Modal -->
+
+        <div id="quickStretchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+
+            <div class="bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-hidden">
+
+                <div class="p-4 border-b flex justify-between items-center">
+
+                    <div>
+
+                        <h3 id="quickStretchTitle" class="text-lg font-bold text-indigo-700">Neck Relief</h3>
+
+                        <p id="quickStretchDuration" class="text-sm text-gray-600">3 min</p>
+
+                    </div>
+
+                    <button id="closeQuickStretchModal" class="text-gray-500">
+
+                        <i class="fas fa-times"></i>
+
+                    </button>
+
+                </div>
+
+                <div class="p-4 overflow-y-auto max-h-[60vh]">
+
+                    <div class="bg-gray-100 rounded-lg aspect-video mb-4 overflow-hidden">
+
+                        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/${quickStretches[state.currentQuickStretch].videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Instructions</h4>
+
+                        <p id="quickStretchInstructions" class="text-gray-700"></p>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <h4 class="font-medium mb-2">Benefits</h4>
+
+                        <p id="quickStretchBenefits" class="text-gray-700"></p>
+
+                    </div>
+
+                </div>
+
+                <div class="p-4 border-t">
+
+                    <button id="startQuickStretchBtn" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold">
+
+                        Start Timer
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script>
+
+        // App Data
+
+        const routines = {
+
+            morning: {
+
+                title: "Morning Mobility",
+
+                duration: "15 minutes",
+
+                stretches: [
+
+                    {
+
+                        name: "Neck Release",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Sit or stand tall. Slowly tilt your head to the right, bringing your ear toward your shoulder. Hold for 15-30 seconds. Repeat on the left side.",
+
+                        benefits: "Relieves tension in the neck and shoulders, improves range of motion, and reduces stiffness.",
+
+                        videoId: "in7PaeYlhrM" // Neck Release video
+
+                    },
+
+                    {
+
+                        name: "Shoulder Rolls",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Stand tall with arms at your sides. Slowly roll your shoulders forward in a circular motion for 30 seconds, then reverse direction.",
+
+                        benefits: "Relieves shoulder tension, improves mobility, and promotes better posture.",
+
+                        videoId: "6RLLOEzdc2s" // Shoulder Rolls video
+
+                    },
+
+                    {
+
+                        name: "Cat-Cow Stretch",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Back",
+
+                        instructions: "Start on hands and knees. Inhale as you drop your belly and lift your head (Cow). Exhale as you round your spine and tuck your chin (Cat). Repeat.",
+
+                        benefits: "Increases spinal flexibility, relieves back tension, and improves posture.",
+
+                        videoId: "kgHkZ6ZhYlY" // Cat-Cow Stretch video
+
+                    },
+
+                    {
+
+                        name: "Standing Forward Fold",
+
+                        duration: "30 seconds",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand with feet hip-width apart. Hinge at hips to fold forward, letting head and arms hang. Bend knees slightly if needed.",
+
+                        benefits: "Stretches hamstrings and lower back, improves circulation, and calms the mind.",
+
+                        videoId: "qI_sFj9GuMQ" // Standing Forward Fold video
+
+                    },
+
+                    {
+
+                        name: "Standing Quad Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand tall, bend one knee to bring heel toward glutes. Hold ankle with hand, keeping knees close. Engage core for balance.",
+
+                        benefits: "Stretches quadriceps, improves balance, and prepares legs for movement.",
+
+                        videoId: "QyAq3wRAYjY" // Standing Quad Stretch video
+
+                    },
+
+                    {
+
+                        name: "Seated Spinal Twist",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Back",
+
+                        instructions: "Sit with legs extended. Bend one knee and cross foot over opposite thigh. Twist torso toward bent knee, using opposite arm for leverage.",
+
+                        benefits: "Improves spinal rotation, stimulates digestion, and relieves back tension.",
+
+                        videoId: "8vF9QJd7-4I" // Seated Spinal Twist video
+
+                    },
+
+                    {
+
+                        name: "Ankle Circles",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Sit or stand. Lift one foot and rotate ankle slowly in circles, then reverse direction. Repeat on other side.",
+
+                        benefits: "Improves ankle mobility and circulation, prevents stiffness.",
+
+                        videoId: "qRkQy4Z5W2I" // Ankle Circles video
+
+                    },
+
+                    {
+
+                        name: "Deep Breathing",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Full Body",
+
+                        instructions: "Sit or stand comfortably. Inhale deeply through nose for 4 counts, hold for 4, exhale through mouth for 6. Repeat.",
+
+                        benefits: "Reduces stress, increases oxygen flow, and promotes relaxation.",
+
+                        videoId: "SEBSr5xJQn8" // Deep Breathing video
+
+                    }
+
+                ]
+
+            },
+
+            evening: {
+
+                title: "Evening Relaxation",
+
+                duration: "12 minutes",
+
+                stretches: [
+
+                    {
+
+                        name: "Neck Release",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Sit or stand tall. Slowly tilt your head to the right, bringing your ear toward your shoulder. Hold for 15-30 seconds. Repeat on the left side.",
+
+                        benefits: "Relieves tension in the neck and shoulders, improves range of motion, and reduces stiffness.",
+
+                        videoId: "in7PaeYlhrM" // Neck Release video
+
+                    },
+
+                    {
+
+                        name: "Seated Forward Bend",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Sit with legs extended. Hinge at hips to fold forward, reaching for toes or shins. Keep back straight.",
+
+                        benefits: "Calms the mind, stretches hamstrings and back, promotes relaxation.",
+
+                        videoId: "qI_sFj9GuMQ" // Seated Forward Bend video
+
+                    },
+
+                    {
+
+                        name: "Child's Pose",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Back",
+
+                        instructions: "Kneel on floor, sit back on heels, then fold forward with arms extended. Rest forehead on floor.",
+
+                        benefits: "Gently stretches back, hips and shoulders; promotes relaxation.",
+
+                        videoId: "2MJGg-dUKh0" // Child's Pose video
+
+                    },
+
+                    {
+
+                        name: "Seated Spinal Twist",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Back",
+
+                        instructions: "Sit with legs extended. Bend one knee and cross foot over opposite thigh. Twist torso toward bent knee, using opposite arm for leverage.",
+
+                        benefits: "Improves spinal rotation, stimulates digestion, and relieves back tension.",
+
+                        videoId: "8vF9QJd7-4I" // Seated Spinal Twist video
+
+                    },
+
+                    {
+
+                        name: "Butterfly Stretch",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Sit with soles of feet together, knees bent out to sides. Hold feet and gently press knees toward floor.",
+
+                        benefits: "Opens hips, stretches inner thighs, and improves flexibility.",
+
+                        videoId: "gdQy6G8j9g0" // Butterfly Stretch video
+
+                    },
+
+                    {
+
+                        name: "Legs-Up-The-Wall",
+
+                        duration: "3 minutes",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Lie on back near wall, swing legs up wall. Rest arms at sides, close eyes and breathe deeply.",
+
+                        benefits: "Relieves tired legs, reduces swelling, and promotes relaxation.",
+
+                        videoId: "VHYLZ3QqUL8" // Legs-Up-The-Wall video
+
+                    }
+
+                ]
+
+            },
+
+            postWorkout: {
+
+                title: "Post-Workout Stretch",
+
+                duration: "14 minutes",
+
+                stretches: [
+
+                    {
+
+                        name: "Standing Quad Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand tall, bend one knee to bring heel toward glutes. Hold ankle with hand, keeping knees close. Engage core for balance.",
+
+                        benefits: "Stretches quadriceps, improves balance, and prevents muscle tightness.",
+
+                        videoId: "QyAq3wRAYjY" // Standing Quad Stretch video
+
+                    },
+
+                    {
+
+                        name: "Hamstring Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand with one foot forward, heel down, toes up. Hinge at hips to lean forward, keeping back straight.",
+
+                        benefits: "Stretches hamstrings, improves flexibility, and prevents injury.",
+
+                        videoId: "7bRa0I9hY4Q" // Hamstring Stretch video
+
+                    },
+
+                    {
+
+                        name: "Calf Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand facing wall, place hands on wall. Step one foot back, keeping heel down, and lean forward.",
+
+                        benefits: "Stretches calf muscles, improves ankle mobility, and prevents tightness.",
+
+                        videoId: "qRkQy4Z5W2I" // Calf Stretch video
+
+                    },
+
+                    {
+
+                        name: "Shoulder Cross-Body Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Bring one arm across body at chest height. Use opposite arm to gently pull it closer to chest.",
+
+                        benefits: "Relieves shoulder tension, improves flexibility, and prevents stiffness.",
+
+                        videoId: "6RLLOEzdc2s" // Shoulder Cross-Body Stretch video
+
+                    },
+
+                    {
+
+                        name: "Triceps Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Reach one arm overhead, bend elbow to touch upper back. Use opposite hand to gently push elbow back.",
+
+                        benefits: "Stretches triceps, improves range of motion, and prevents tightness.",
+
+                        videoId: "XeErfmwCXg4" // Triceps Stretch video
+
+                    },
+
+                    {
+
+                        name: "Standing Side Bend",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Core",
+
+                        instructions: "Stand tall, reach one arm overhead and lean to opposite side. Keep hips stable.",
+
+                        benefits: "Stretches obliques and side body, improves flexibility.",
+
+                        videoId: "lBqjZ4jY8hM" // Standing Side Bend video
+
+                    },
+
+                    {
+
+                        name: "Deep Breathing",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Full Body",
+
+                        instructions: "Stand tall, inhale deeply through nose, expanding belly. Exhale fully through mouth.",
+
+                        benefits: "Promotes relaxation, reduces stress, and aids recovery.",
+
+                        videoId: "SEBSr5xJQn8" // Deep Breathing video
+
+                    }
+
+                ]
+
+            },
+
+            upperBody: {
+
+                title: "Upper Body Relief",
+
+                duration: "10 minutes",
+
+                stretches: [
+
+                    {
+
+                        name: "Neck Release",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Sit or stand tall. Slowly tilt your head to the right, bringing your ear toward your shoulder. Hold for 15-30 seconds. Repeat on the left side.",
+
+                        benefits: "Relieves tension in the neck and shoulders, improves range of motion, and reduces stiffness.",
+
+                        videoId: "in7PaeYlhrM" // Neck Release video
+
+                    },
+
+                    {
+
+                        name: "Shoulder Rolls",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Stand tall with arms at your sides. Slowly roll your shoulders forward in a circular motion for 30 seconds, then reverse direction.",
+
+                        benefits: "Relieves shoulder tension, improves mobility, and promotes better posture.",
+
+                        videoId: "6RLLOEzdc2s" // Shoulder Rolls video
+
+                    },
+
+                    {
+
+                        name: "Cross-Body Shoulder Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Bring one arm across body at chest height. Use opposite arm to gently pull it closer to chest.",
+
+                        benefits: "Stretches rear shoulder muscles and improves flexibility.",
+
+                        videoId: "6RLLOEzdc2s" // Cross-Body Shoulder Stretch video
+
+                    },
+
+                    {
+
+                        name: "Overhead Triceps Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Reach one arm overhead, bend elbow to touch upper back. Use opposite hand to gently push elbow back.",
+
+                        benefits: "Stretches triceps and improves range of motion.",
+
+                        videoId: "XeErfmwCXg4" // Overhead Triceps Stretch video
+
+                    },
+
+                    {
+
+                        name: "Chest Opener",
+
+                        duration: "30 seconds",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Clasp hands behind back, straighten arms and lift them slightly. Open chest and roll shoulders back.",
+
+                        benefits: "Counters hunched posture, stretches chest muscles, and improves breathing.",
+
+                        videoId: "g-7NE8Zrgbs" // Chest Opener video
+
+                    }
+
+                ]
+
+            },
+
+            lowerBody: {
+
+                title: "Lower Body Flexibility",
+
+                duration: "12 minutes",
+
+                stretches: [
+
+                    {
+
+                        name: "Standing Quad Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                instructions: "Stand tall, bend one knee to bring heel toward glutes. Hold ankle with hand, keeping knees close. Engage core for balance.",
+
+                        benefits: "Stretches quadriceps and improves balance.",
+
+                        videoId: "QyAq3wRAYjY" // Standing Quad Stretch video
+
+                    },
+
+                    {
+
+                        name: "Hamstring Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand with one foot forward, heel down, toes up. Hinge at hips to lean forward, keeping back straight.",
+
+                        benefits: "Stretches hamstrings and improves flexibility.",
+
+                        videoId: "7bRa0I9hY4Q" // Hamstring Stretch video
+
+                    },
+
+                    {
+
+                        name: "Calf Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Stand facing wall, place hands on wall. Step one foot back, keeping heel down, and lean forward.",
+
+                        benefits: "Stretches calf muscles and improves ankle mobility.",
+
+                        videoId: "qRkQy4Z5W2I" // Calf Stretch video
+
+                    },
+
+                    {
+
+                        name: "Butterfly Stretch",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Sit with soles of feet together, knees bent out to sides. Hold feet and gently press knees toward floor.",
+
+                        benefits: "Opens hips and stretches inner thighs.",
+
+                        videoId: "gdQy6G8j9g0" // Butterfly Stretch video
+
+                    },
+
+                    {
+
+                        name: "Seated Forward Bend",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Sit with legs extended. Hinge at hips to fold forward, reaching for toes or shins. Keep back straight.",
+
+                        benefits: "Stretches hamstrings and lower back.",
+
+                        videoId: "qI_sFj9GuMQ"
+
+                    },
+
+                    {
+
+                        name: "Figure Four Stretch",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Lower Body",
+
+                        instructions: "Lie on back, cross one ankle over opposite thigh. Reach through and pull uncrossed leg toward chest.",
+
+                        benefits: "Stretches glutes and outer hips.",
+
+                        videoId: "gdQy6G8j9g0"
+
+                    }
+
+                ]
+
+            },
+
+            deskBreak: {
+
+                title: "Desk Break Quickie",
+
+                duration: "8 minutes",
+
+                stretches: [
+
+                    {
+
+                        name: "Neck Release",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Sit tall. Slowly tilt your head to the right, bringing your ear toward your shoulder. Hold for 15-30 seconds. Repeat on the left side.",
+
+                        benefits: "Relieves tension from prolonged sitting and computer use.",
+
+                        videoId: "in7PaeYlhrM"
+
+                    },
+
+                    {
+
+                        name: "Shoulder Rolls",
+
+                        duration: "1 minute",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Sit tall. Slowly roll your shoulders forward in a circular motion for 30 seconds, then reverse direction.",
+
+                        benefits: "Relieves shoulder tension from typing and mouse use.",
+
+                        videoId: "6RLLOEzdc2s"
+
+                    },
+
+                    {
+
+                        name: "Seated Spinal Twist",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Back",
+
+                        instructions: "Sit tall, place one hand on opposite knee and other on chair back. Gently twist toward hand on chair.",
+
+                        benefits: "Counters stiffness from prolonged sitting and improves spinal mobility.",
+
+                        videoId: "8vF9QJd7-4I"
+
+                    },
+
+                    {
+
+                        name: "Wrist Circles",
+
+                        duration: "30 sec each side",
+
+                        bodyPart: "Upper Body",
+
+                        instructions: "Extend arms forward, make circles with wrists in both directions.",
+
+                        benefits: "Relieves tension from typing and prevents repetitive strain.",
+
+                        videoId: "XeErfmwCXg4"
+
+                    }
+
+                ]
+
+            }
+
+        };
+
+
+
+        // Quick stretches data
+
+        const quickStretches = {
+
+            neck: {
+
+                name: "Neck Relief",
+
+                duration: "3 min",
+
+                instructions: "1. Sit or stand tall with good posture.\n2. Slowly tilt your head to the right, bringing your right ear toward your right shoulder.\n3. Hold for 30 seconds.\n4. Return to center and repeat on the left side.\n5. Then, slowly drop your chin toward your chest and hold for 30 seconds.\n6. Finally, gently tilt your head back to look up at the ceiling and hold for 30 seconds.",
+
+                benefits: "Relieves tension in the neck and shoulders, improves range of motion, reduces stiffness, and can help prevent headaches caused by muscle tension.",
+
+                videoId: "in7PaeYlhrM" // Neck Relief video
+
+            },
+
+            shoulder: {
+
+                name: "Shoulder Release",
+
+                duration: "4 min",
+
+                instructions: "1. Stand or sit tall with arms at your sides.\n2. Slowly roll your shoulders forward in a circular motion for 1 minute.\n3. Reverse direction and roll shoulders backward for 1 minute.\n4. Bring your right arm across your chest and use your left hand to gently pull it closer to your chest. Hold for 30 seconds.\n5. Repeat with the left arm.\n6. Clasp your hands behind your back and gently straighten your arms while lifting them slightly. Hold for 30 seconds.",
+
+                benefits: "Relieves shoulder tension, improves mobility, promotes better posture, and can help prevent repetitive strain injuries.",
+
+                videoId: "6RLLOEzdc2s"
+
+            },
+
+            back: {
+
+                name: "Back Stretch",
+
+                duration: "5 min",
+
+                instructions: "1. Stand with feet hip-width apart and knees slightly bent.\n2. Hinge at your hips to fold forward, letting your head and arms hang. Hold for 30 seconds.\n3. Come up halfway, placing hands on thighs with a flat back. Hold for 30 seconds.\n4. Return to standing.\n5. Stand tall and reach both arms overhead, then lean gently to the right. Hold for 30 seconds.\n6. Repeat on the left side.\n7. Place hands on hips and gently arch backward. Hold for 30 seconds.",
+
+                benefits: "Stretches the entire back, improves spinal flexibility, relieves tension, and can help alleviate lower back pain.",
+
+                videoId: "2MJGg-dUKh0"
+
+            },
+
+            leg: {
+
+                name: "Leg Loosener",
+
+                duration: "4 min",
+
+                instructions: "1. Stand tall and hold onto a wall or chair for balance if needed.\n2. Bend your right knee to bring your heel toward your glutes, holding your ankle with your right hand.\n3. Keep knees close together and engage your core. Hold for 30 seconds.\n4. Repeat with the left leg.\n5. Step your right foot forward into a lunge position, keeping your left heel down to stretch the calf. Hold for 30 seconds.\n6. Repeat with the left leg.\n7. Stand with feet together and slowly squat down as far as comfortable, keeping heels on the ground. Hold for 30 seconds.",
+
+                benefits: "Stretches quadriceps, hamstrings, and calves, improves lower body flexibility, enhances circulation, and can help prevent muscle tightness after sitting."
+
+            }
+
+        };
+
+
+
+        // App State
+
+        let state = {
+
+            user: {
+
+                name: 'John Doe',
+
+                email: 'john@example.com'
+
+            },
+
+            currentTab: 'home',
+
+            currentRoutine: null,
+
+            currentStretchIndex: 0,
+
+            waterIntake: 0,
+
+            streak: 0,
+
+            totalSessions: 0,
+
+            weeklyMinutes: 0,
+
+            hydrationAverage: 0,
+
+            activityLog: [],
+
+            currentQuickStretch: null,
+
+            timerInterval: null,
+
+            timerSeconds: 0
+
+        };
+
+
+
+        // Initialize the app
+
+        function initializeApp() {
+
+            // Initialize all stretches display after a small delay to ensure DOM is ready
+
+            setTimeout(() => {
+
+                populateAllStretches();
+
+                bindAllEventListeners();
+
+            }, 100);
+
+            // Load saved state from localStorage after DOM is ready
+
+            const savedState = localStorage.getItem('stretchWellState');
+
+            const savedRoutines = localStorage.getItem('stretchWellRoutines');
+
+            if (savedState) {
+
+                state = JSON.parse(savedState);
+
+            }
+
+            if (savedRoutines) {
+
+                Object.assign(routines, JSON.parse(savedRoutines));
+
+                // Update library display with custom routines
+
+                const routinesList = document.getElementById('routinesList');
+
+                Object.entries(routines).forEach(([id, routine]) => {
+
+                    if (!['morning','evening','postWorkout','upperBody','lowerBody','deskBreak'].includes(id)) {
+
+                        const routineEl = document.createElement('div');
+
+                        routineEl.className = 'routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer';
+
+                        routineEl.setAttribute('data-routine', id);
+
+                        routineEl.innerHTML = `
+
+                            <div class="flex justify-between items-center">
+
+                                <div>
+
+                                    <h4 class="font-bold text-indigo-700">${routine.title}</h4>
+
+                                    <p class="text-sm text-gray-600">${routine.stretches.length} stretches • ${routine.duration} • Custom</p>
+
+                                </div>
+
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+
+                            </div>
+
+                        `;
+
+                        routinesList.appendChild(routineEl);
+
+                        routineEl.addEventListener('click', function() {
+
+                            openRoutineModal(id);
+
+                        });
+
+                    }
+
+                });
+
+            }
+
+            
+
+            // Initialize UI based on state after elements exist
+
+            setTimeout(updateUI, 100);
+
+            
+
+        function bindAllEventListeners() {
+
+            // Tab Navigation
+
+            document.getElementById('homeTab').addEventListener('click', () => switchTab('home'));
+
+            document.getElementById('libraryTab').addEventListener('click', () => switchTab('library'));
+
+            document.getElementById('progressTab').addEventListener('click', () => switchTab('progress'));
+
+            
+
+            // Routine Cards - ensure elements exist first
+
+            const routineCards = document.querySelectorAll('.routine-card');
+
+            if (routineCards.length) {
+
+                routineCards.forEach(card => {
+
+                    card.addEventListener('click', function() {
+
+                        const routineId = this.getAttribute('data-routine');
+
+                        openRoutineModal(routineId);
+
+                    });
+
+                });
+
+            }
+
+            document.querySelectorAll('.routine-card').forEach(card => {
+
+                card.addEventListener('click', function() {
+
+                    const routineId = this.getAttribute('data-routine');
+
+                    openRoutineModal(routineId);
+
+                });
+
+            });
+
+            
+
+            // Recommended Routine - check if element exists
+
+            const recommendedRoutine = document.getElementById('recommendedRoutine');
+
+            if (recommendedRoutine) {
+
+                recommendedRoutine.addEventListener('click', function() {
+
+                    openRoutineModal('morning');
+
+                });
+
+            }
+
+            document.getElementById('recommendedRoutine').addEventListener('click', function() {
+
+                openRoutineModal('morning');
+
+            });
+
+            
+
+            const eveningRoutine = document.getElementById('eveningRoutine');
+
+            if (eveningRoutine) {
+
+                eveningRoutine.addEventListener('click', function() {
+
+                    openRoutineModal('evening');
+
+                });
+
+            }
+
+            
+
+            const deskRoutine = document.getElementById('deskRoutine');
+
+            if (deskRoutine) {
+
+                deskRoutine.addEventListener('click', function() {
+
+                    openRoutineModal('deskBreak');
+
+                });
+
+            }
+
+            
+
+            // Routine Navigation - ensure elements exist
+
+            const prevRoutineBtn = document.getElementById('prevRoutineStretchBtn');
+
+            const nextRoutineBtn = document.getElementById('nextRoutineStretchBtn');
+
+            if (prevRoutineBtn && nextRoutineBtn) {
+
+                prevRoutineBtn.addEventListener('click', prevRoutineStretch);
+
+                nextRoutineBtn.addEventListener('click', nextRoutineStretch);
+
+            }
+
+            document.getElementById('prevRoutineStretchBtn').addEventListener('click', prevRoutineStretch);
+
+            document.getElementById('nextRoutineStretchBtn').addEventListener('click', nextRoutineStretch);
+
+            
+
+            // Close Routine Modal - check if element exists
+
+            const closeRoutineModalBtn = document.getElementById('closeRoutineModal');
+
+            if (closeRoutineModalBtn) {
+
+                closeRoutineModalBtn.addEventListener('click', closeRoutineModal);
+
+            }
+
+            
+
+            // Session Navigation - check if elements exist
+
+            const prevStretchBtn = document.getElementById('prevStretchBtn');
+
+            const nextStretchBtn = document.getElementById('nextStretchBtn');
+
+            const closeSessionBtn = document.getElementById('closeSessionModal');
+
+            if (prevStretchBtn && nextStretchBtn && closeSessionBtn) {
+
+                prevStretchBtn.addEventListener('click', prevStretch);
+
+                nextStretchBtn.addEventListener('click', nextStretch);
+
+                closeSessionBtn.addEventListener('click', endSession);
+
+            }
+
+            
+
+            // Water Tracker - ensure elements exist
+
+            const drinkGlasses = document.querySelectorAll('.drink-glass');
+
+            if (drinkGlasses.length) {
+
+                drinkGlasses.forEach(glass => {
+
+                    glass.addEventListener('click', function() {
+
+                        const index = parseInt(this.getAttribute('data-index'));
+
+                        updateWaterIntake(index + 1);
+
+                    });
+
+                });
+
+            }
+
+            
+
+            // Quick Stretches - check if elements exist
+
+            const quickStretches = document.querySelectorAll('.quick-stretch');
+
+            if (quickStretches.length) {
+
+                quickStretches.forEach(stretch => {
+
+                    stretch.addEventListener('click', function() {
+
+                        const stretchId = this.getAttribute('data-stretch');
+
+                        openQuickStretchModal(stretchId);
+
+                    });
+
+                });
+
+            }
+
+            
+
+            // Profile Modal - check if elements exist
+
+            const profileBtn = document.getElementById('profileBtn');
+
+            const closeProfileBtn = document.getElementById('closeProfileModal');
+
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            if (profileBtn && closeProfileBtn && logoutBtn) {
+
+                profileBtn.addEventListener('click', openProfileModal);
+
+                closeProfileBtn.addEventListener('click', closeProfileModal);
+
+                logoutBtn.addEventListener('click', logout);
+
+            }
+
+            
+
+            // Quick Stretch Modal - check if elements exist
+
+            const closeQuickStretchBtn = document.getElementById('closeQuickStretchModal');
+
+            const startQuickStretchBtn = document.getElementById('startQuickStretchBtn');
+
+            if (closeQuickStretchBtn && startQuickStretchBtn) {
+
+                closeQuickStretchBtn.addEventListener('click', closeQuickStretchModal);
+
+                startQuickStretchBtn.addEventListener('click', startQuickStretchTimer);
+
+            }
+
+
+
+            // Routine Creation - check if elements exist
+
+            const createRoutineBtn = document.getElementById('createRoutineBtn');
+
+            const closeCreateRoutineBtn = document.getElementById('closeCreateRoutineModal');
+
+            const saveRoutineBtn = document.getElementById('saveRoutineBtn');
+
+            const deleteRoutineBtn = document.getElementById('deleteRoutineBtn');
+
+            if (createRoutineBtn && closeCreateRoutineBtn && saveRoutineBtn) {
+
+                createRoutineBtn.addEventListener('click', openCreateRoutineModal);
+
+                closeCreateRoutineBtn.addEventListener('click', closeCreateRoutineModal);
+
+                saveRoutineBtn.addEventListener('click', saveNewRoutine);
+
+            }
+
+            if (deleteRoutineBtn) {
+
+                deleteRoutineBtn.addEventListener('click', deleteCurrentRoutine);
+
+            }
+
+            
+
+            // Initialize water glasses after ensuring they exist
+
+            setTimeout(updateWaterGlasses, 100);
+
+        }
+
+        }
+
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+
+            initializeApp();
+
+        });
+
+
+
+        // Update UI based on state
+
+        function updateUI() {
+
+            // Update tabs
+
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+
+            document.getElementById(`${state.currentTab}Content`).classList.remove('hidden');
+
+            
+
+            // Update bottom navigation
+
+            document.querySelectorAll('.tab-button').forEach(button => {
+
+                button.classList.remove('active', 'text-indigo-600');
+
+                button.classList.add('text-gray-500');
+
+                
+
+                // Reset icons to default state
+
+                const icon = button.querySelector('i');
+
+                if (icon) {
+
+                    switch (icon.classList[1]) {
+
+                        case 'fa-home':
+
+                            icon.classList.remove('text-indigo-600');
+
+                            break;
+
+                        case 'fa-book':
+
+                            icon.classList.remove('text-indigo-600');
+
+                            break;
+
+                        case 'fa-chart-line':
+
+                            icon.classList.remove('text-indigo-600');
+
+                            break;
+
+                    }
+
+                }
+
+            });
+
+            
+
+            const activeTabButton = document.getElementById(`${state.currentTab}Tab`);
+
+            activeTabButton.classList.add('active', 'text-indigo-600');
+
+            activeTabButton.classList.remove('text-gray-500');
+
+            
+
+            // Update icon color for active tab
+
+            const activeIcon = activeTabButton.querySelector('i');
+
+            if (activeIcon) {
+
+                activeIcon.classList.add('text-indigo-600');
+
+            }
+
+            
+
+            // Update progress stats
+
+            document.getElementById('streakCount').textContent = state.streak;
+
+            document.getElementById('currentStreak').textContent = state.streak;
+
+            document.getElementById('totalSessions').textContent = state.totalSessions;
+
+            document.getElementById('weeklyMinutes').textContent = `${state.weeklyMinutes} min/week`;
+
+            document.getElementById('hydrationAverage').textContent = `${state.hydrationAverage} avg/day`;
+
+            
+
+            // Update charts
+
+            updateActivityChart();
+
+            updateHydrationChart();
+
+            
+
+            // Update stretch focus areas
+
+            document.querySelector('[data-area="upper"]').style.width = `${state.stretchAreas['Upper Body']}%`;
+
+            document.querySelector('[data-area="lower"]').style.width = `${state.stretchAreas['Lower Body']}%`;
+
+            document.querySelector('[data-area="back"]').style.width = `${state.stretchAreas['Back']}%`;
+
+            document.querySelector('[data-area="full"]').style.width = `${state.stretchAreas['Full Body']}%`;
+
+            
+
+            document.getElementById('upper-percent').textContent = `${state.stretchAreas['Upper Body']}%`;
+
+            document.getElementById('lower-percent').textContent = `${state.stretchAreas['Lower Body']}%`;
+
+            document.getElementById('back-percent').textContent = `${state.stretchAreas['Back']}%`;
+
+            document.getElementById('full-percent').textContent = `${state.stretchAreas['Full Body']}%`;
+
+            
+
+            // Update recent activity
+
+            updateRecentActivity();
+
+        }
+
+        
+
+        function updateActivityChart() {
+
+            const chart = document.getElementById('weeklyActivityChart');
+
+            chart.innerHTML = '';
+
+            
+
+            // Generate mock weekly data (in a real app this would come from your data)
+
+            const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+            days.forEach((day, i) => {
+
+                const randMinutes = Math.floor(Math.random() * 30) + 5;
+
+                const height = Math.min(randMinutes / 30 * 100, 100);
+
+                
+
+                const col = document.createElement('div');
+
+                col.className = `chart-column ${i === days.length - 1 ? 'active' : ''}`;
+
+                col.style.height = `${height}%`;
+
+                col.setAttribute('data-day', day);
+
+                chart.appendChild(col);
+
+            });
+
+        }
+
+        
+
+        function updateHydrationChart() {
+
+            const chart = document.getElementById('hydrationChart');
+
+            chart.innerHTML = '';
+
+            
+
+            // Generate mock hydration data
+
+            const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+            days.forEach((day, i) => {
+
+                const randGlasses = Math.floor(Math.random() * 8) + 1;
+
+                const height = Math.min(randGlasses / 8 * 100, 100);
+
+                
+
+                const col = document.createElement('div');
+
+                col.className = `chart-column ${i === days.length - 1 ? 'active' : ''}`;
+
+                col.style.height = `${height}%`;
+
+                col.style.backgroundColor = `rgba(59, 130, 246, ${0.2 + randGlasses/8 * 0.6})`;
+
+                if (i === days.length - 1) {
+
+                    col.style.backgroundColor = `rgba(59, 130, 246, 0.8)`;
+
+                }
+
+                col.setAttribute('data-day', day);
+
+                chart.appendChild(col);
+
+            });
+
+        }
+
+        
+
+        function updateRecentActivity() {
+
+            const container = document.getElementById('recentActivity');
+
+            container.innerHTML = '';
+
+            
+
+            // Show last 5 activities
+
+            const activities = state.activityLog.slice(0, 5);
+
+            
+
+            if (activities.length === 0) {
+
+                container.innerHTML = '<p class="text-gray-500 text-sm">No recent activity yet</p>';
+
+                return;
+
+            }
+
+            
+
+            activities.forEach(activity => {
+
+                const activityEl = document.createElement('div');
+
+                activityEl.className = 'flex items-start pl-2 py-2 border-l-4 border-indigo-200';
+
+                
+
+                let icon = '';
+
+                let color = 'indigo';
+
+                if (activity.type.includes('water')) {
+
+                    icon = 'fa-glass-water';
+
+                    color = 'blue';
+
+                } else if (activity.type.includes('quick')) {
+
+                    icon = 'fa-bolt';
+
+                    color = 'yellow';
+
+                } else {
+
+                    icon = 'fa-calendar-check';
+
+                }
+
+                
+
+                activityEl.innerHTML = `
+
+                    <div class="w-8 h-8 rounded-full bg-${color}-100 flex items-center justify-center mr-3 flex-shrink-0">
+
+                        <i class="fas ${icon} text-${color}-500"></i>
+
+                    </div>
+
+                    <div class="flex-1">
+
+                        <p class="text-sm font-medium text-gray-800">${activity.type}</p>
+
+                        <p class="text-xs text-gray-500">${activity.date}</p>
+
+                    </div>
+
+                `;
+
+                
+
+                container.appendChild(activityEl);
+
+            });
+
+        }
+
+
+
+        // Switch between tabs
+
+        function switchTab(tab) {
+
+            state.currentTab = tab;
+
+            updateUI();
+
+            saveState();
+
+        }
+
+
+
+        // Open routine modal
+
+        function openRoutineModal(routineId) {
+
+            state.currentRoutine = routineId;
+
+            state.currentStretchIndex = 0;
+
+            
+
+            // Show delete button only for custom routines
+
+            const deleteBtn = document.getElementById('deleteRoutineBtn');
+
+            if (['morning','evening','postWorkout','upperBody','lowerBody','deskBreak'].includes(routineId)) {
+
+                deleteBtn.classList.add('hidden');
+
+            } else {
+
+                deleteBtn.classList.remove('hidden');
+
+            }
+
+            
+
+            showCurrentRoutineStretch();
+
+            document.getElementById('routineModal').classList.remove('hidden');
+
+        }
+
+
+
+        // Delete current routine
+
+        function deleteCurrentRoutine() {
+
+            if (!state.currentRoutine || 
+
+                ['morning','evening','postWorkout','upperBody','lowerBody','deskBreak'].includes(state.currentRoutine)) {
+
+                return;
+
+            }
+
+
+
+            if (confirm(`Are you sure you want to delete "${routines[state.currentRoutine].title}"?`)) {
+
+                // Remove routine from data
+
+                delete routines[state.currentRoutine];
+
+                
+
+                // Remove routine card from UI
+
+                document.querySelector(`.routine-card[data-routine="${state.currentRoutine}"]`).remove();
+
+                
+
+                // Close modal
+
+                closeRoutineModal();
+
+                
+
+                // Save changes
+
+                saveState();
+
+                
+
+                alert('Routine deleted successfully');
+
+            }
+
+        }
+
+
+
+        // Show current stretch in routine
+
+        function showCurrentRoutineStretch() {
+
+            const routine = routines[state.currentRoutine];
+
+            const stretch = routine.stretches[state.currentStretchIndex];
+
+            
+
+            document.getElementById('routineModalTitle').textContent = routine.title;
+
+            document.getElementById('routineStretchCount').textContent = `${state.currentStretchIndex + 1} of ${routine.stretches.length}`;
+
+            document.getElementById('routineVideo').src = `https://www.youtube.com/embed/${stretch.videoId}`;
+
+            document.getElementById('routineInstructions').textContent = stretch.instructions;
+
+            document.getElementById('routineBenefits').textContent = stretch.benefits;
+
+            
+
+            // Disable previous button on first stretch
+
+            if (state.currentStretchIndex === 0) {
+
+                document.getElementById('prevRoutineStretchBtn').classList.add('opacity-50', 'pointer-events-none');
+
+            } else {
+
+                document.getElementById('prevRoutineStretchBtn').classList.remove('opacity-50', 'pointer-events-none');
+
+            }
+
+            
+
+            // Change next button text on last stretch
+
+            if (state.currentStretchIndex === routine.stretches.length - 1) {
+
+                document.getElementById('nextRoutineStretchBtn').innerHTML = 'Start Routine <i class="fas fa-play ml-1"></i>';
+
+            } else {
+
+                document.getElementById('nextRoutineStretchBtn').innerHTML = 'Next <i class="fas fa-arrow-right ml-1"></i>';
+
+            }
+
+        }
+
+
+
+        // Go to previous stretch in routine
+
+        function prevRoutineStretch() {
+
+            if (state.currentStretchIndex > 0) {
+
+                state.currentStretchIndex--;
+
+                showCurrentRoutineStretch();
+
+            }
+
+        }
+
+
+
+        // Go to next stretch or start routine
+
+        function nextRoutineStretch() {
+
+            const routine = routines[state.currentRoutine];
+
+            
+
+            if (state.currentStretchIndex < routine.stretches.length - 1) {
+
+                state.currentStretchIndex++;
+
+                showCurrentRoutineStretch();
+
+            } else {
+
+                startRoutine();
+
+            }
+
+        }
+
+
+
+        // Close routine modal
+
+        function closeRoutineModal() {
+
+            document.getElementById('routineModal').classList.add('hidden');
+
+        }
+
+
+
+        // Start a routine
+
+        function startRoutine() {
+
+            state.currentStretchIndex = 0;
+
+            showCurrentStretch();
+
+            document.getElementById('routineModal').classList.add('hidden');
+
+            document.getElementById('sessionModal').classList.remove('hidden');
+
+            
+
+            // Log activity
+
+            const routine = routines[state.currentRoutine];
+
+            logActivity(`Completed ${routine.title} routine`, new Date().toLocaleDateString());
+
+            
+
+            // Update streak if this is the first session today
+
+            const today = new Date().toLocaleDateString();
+
+            const lastActivity = state.activityLog[0];
+
+            if (!lastActivity || lastActivity.date !== today) {
+
+                state.streak++;
+
+            } else {
+
+                // Reset streak if more than one day has passed
+
+                const lastDate = new Date(lastActivity.date);
+
+                const currentDate = new Date();
+
+                const diffTime = Math.abs(currentDate - lastDate);
+
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                
+
+                if (diffDays > 1) {
+
+                    state.streak = 1;
+
+                }
+
+            }
+
+            
+
+            state.totalSessions++;
+
+            state.weeklyMinutes += parseInt(routine.duration);
+
+            saveState();
+
+            updateUI();
+
+        }
+
+
+
+        // Show current stretch in session
+
+        function showCurrentStretch() {
+
+            const routine = routines[state.currentRoutine];
+
+            const stretch = routine.stretches[state.currentStretchIndex];
+
+            
+
+            document.getElementById('sessionTitle').textContent = stretch.name;
+
+            document.getElementById('sessionBodyPart').textContent = stretch.bodyPart;
+
+            document.getElementById('sessionInstructions').textContent = stretch.instructions;
+
+            document.getElementById('sessionBenefits').textContent = stretch.benefits;
+
+            
+
+            // Parse duration (e.g., "30 sec" -> 30)
+
+            const durationMatch = stretch.duration.match(/\d+/);
+
+            const durationSec = durationMatch ? parseInt(durationMatch[0]) : 30;
+
+            document.getElementById('sessionTimer').textContent = `0:${durationSec.toString().padStart(2, '0')}`;
+
+            
+
+            // Disable previous button on first stretch
+
+            if (state.currentStretchIndex === 0) {
+
+                document.getElementById('prevStretchBtn').classList.add('opacity-50', 'pointer-events-none');
+
+            } else {
+
+                document.getElementById('prevStretchBtn').classList.remove('opacity-50', 'pointer-events-none');
+
+            }
+
+            
+
+            // Change next button text on last stretch
+
+            if (state.currentStretchIndex === routine.stretches.length - 1) {
+
+                document.getElementById('nextStretchBtn').innerHTML = 'Finish <i class="fas fa-check ml-1"></i>';
+
+            } else {
+
+                document.getElementById('nextStretchBtn').innerHTML = 'Next <i class="fas fa-arrow-right ml-1"></i>';
+
+            }
+
+        }
+
+
+
+        // Go to previous stretch
+
+        function prevStretch() {
+
+            if (state.currentStretchIndex > 0) {
+
+                state.currentStretchIndex--;
+
+                showCurrentStretch();
+
+            }
+
+        }
+
+
+
+        // Go to next stretch or finish routine
+
+        function nextStretch() {
+
+            const routine = routines[state.currentRoutine];
+
+            
+
+            if (state.currentStretchIndex < routine.stretches.length - 1) {
+
+                state.currentStretchIndex++;
+
+                showCurrentStretch();
+
+            } else {
+
+                endSession();
+
+            }
+
+        }
+
+
+
+        // End the current session
+
+        function endSession() {
+
+            document.getElementById('sessionModal').classList.add('hidden');
+
+        }
+
+
+
+        // Open quick stretch modal
+
+        function openQuickStretchModal(stretchId) {
+
+            state.currentQuickStretch = stretchId;
+
+            const stretch = quickStretches[stretchId];
+
+            
+
+            document.getElementById('quickStretchTitle').textContent = stretch.name;
+
+            document.getElementById('quickStretchDuration').textContent = stretch.duration;
+
+            document.getElementById('quickStretchInstructions').textContent = stretch.instructions;
+
+            document.getElementById('quickStretchBenefits').textContent = stretch.benefits;
+
+            
+
+            document.getElementById('quickStretchModal').classList.remove('hidden');
+
+        }
+
+
+
+        // Close quick stretch modal
+
+        function closeQuickStretchModal() {
+
+            if (state.timerInterval) {
+
+                clearInterval(state.timerInterval);
+
+                state.timerInterval = null;
+
+            }
+
+            document.getElementById('quickStretchModal').classList.add('hidden');
+
+        }
+
+
+
+        // Start quick stretch timer
+
+        function startQuickStretchTimer() {
+
+            const stretch = quickStretches[state.currentQuickStretch];
+
+            const durationMatch = stretch.duration.match(/\d+/);
+
+            state.timerSeconds = durationMatch ? parseInt(durationMatch[0]) * 60 : 180; // Convert minutes to seconds
+
+            
+
+            // Update button
+
+            const startBtn = document.getElementById('startQuickStretchBtn');
+
+            startBtn.innerHTML = '<i class="fas fa-stop mr-2"></i>Stop Timer';
+
+            startBtn.classList.remove('bg-indigo-600');
+
+            startBtn.classList.add('bg-red-600');
+
+            startBtn.removeEventListener('click', startQuickStretchTimer);
+
+            startBtn.addEventListener('click', stopQuickStretchTimer);
+
+            
+
+            // Start timer
+
+            updateQuickStretchTimerDisplay();
+
+            state.timerInterval = setInterval(() => {
+
+                state.timerSeconds--;
+
+                updateQuickStretchTimerDisplay();
+
+                
+
+                if (state.timerSeconds <= 0) {
+
+                    stopQuickStretchTimer();
+
+                    // Log activity
+
+                    logActivity(`Completed ${stretch.name} quick stretch`, new Date().toLocaleDateString());
+
+                    // Update stats
+
+                    state.totalSessions++;
+
+                    state.weeklyMinutes += parseInt(stretch.duration);
+
+                    saveState();
+
+                    updateUI();
+
+                }
+
+            }, 1000);
+
+        }
+
+
+
+        // Profile functions
+
+        function openProfileModal() {
+
+            // You could load user data here
+
+            document.getElementById('profileModal').classList.remove('hidden');
+
+        }
+
+
+
+        function closeProfileModal() {
+
+            document.getElementById('profileModal').classList.add('hidden');
+
+        }
+
+
+
+        function logout() {
+
+            if (confirm('Are you sure you want to sign out?')) {
+
+                // Reset user session data (in a real app this would call your backend)
+
+                localStorage.removeItem('stretchWellState');
+
+                alert('You have been signed out. Page will reload.');
+
+                location.reload();
+
+            }
+
+        }
+
+
+
+        // Stop quick stretch timer
+
+        function stopQuickStretchTimer() {
+
+            if (state.timerInterval) {
+
+                clearInterval(state.timerInterval);
+
+                state.timerInterval = null;
+
+            }
+
+            
+
+            // Reset button
+
+            const startBtn = document.getElementById('startQuickStretchBtn');
+
+            startBtn.innerHTML = 'Start Timer';
+
+            startBtn.classList.add('bg-indigo-600');
+
+            startBtn.classList.remove('bg-red-600');
+
+            startBtn.removeEventListener('click', stopQuickStretchTimer);
+
+            startBtn.addEventListener('click', startQuickStretchTimer);
+
+            
+
+            // Reset timer display
+
+            const stretch = quickStretches[state.currentQuickStretch];
+
+            document.getElementById('quickStretchDuration').textContent = stretch.duration;
+
+        }
+
+
+
+        // Update quick stretch timer display
+
+        function updateQuickStretchTimerDisplay() {
+
+            const minutes = Math.floor(state.timerSeconds / 60);
+
+            const seconds = state.timerSeconds % 60;
+
+            document.getElementById('quickStretchDuration').textContent = 
+
+                `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+        }
+
+
+
+        // Update water intake
+
+        function updateWaterIntake(glasses) {
+
+            state.waterIntake = Math.min(Math.max(glasses, 0), 8);
+
+            state.hydrationAverage = Math.round((state.hydrationAverage * 6 + state.waterIntake) / 7);
+
+            
+
+            document.getElementById('waterCount').textContent = `${state.waterIntake}/8`;
+
+            updateWaterGlasses();
+
+            
+
+            // Log activity if adding water
+
+            if (glasses > 0 && glasses !== state.waterIntake) {
+
+                logActivity('Added water', new Date().toLocaleDateString());
+
+            }
+
+            
+
+            saveState();
+
+            updateUI();
+
+        }
+
+
+
+        // Update water glasses UI
+
+        function updateWaterGlasses() {
+
+            document.querySelectorAll('.drink-glass').forEach((glass, index) => {
+
+                const icon = glass.querySelector('i');
+
+                const container = glass.querySelector('div');
+
+                
+
+                if (index < state.waterIntake) {
+
+                    icon.classList.remove('text-gray-300');
+
+                    icon.classList.add('text-blue-500');
+
+                    container.classList.remove('border-blue-100');
+
+                    container.classList.add('border-blue-400', 'bg-blue-50');
+
+                } else {
+
+                    icon.classList.remove('text-blue-500');
+
+                    icon.classList.add('text-gray-300');
+
+                    container.classList.remove('border-blue-400', 'bg-blue-50');
+
+                    container.classList.add('border-blue-100');
+
+                }
+
+                
+
+                glass.onclick = () => updateWaterIntake(index + 1);
+
+            });
+
+            
+
+            // Update progress bar
+
+            const progressPercent = (state.waterIntake / 8) * 100;
+
+            document.getElementById('waterProgress').style.width = `${progressPercent}%`;
+
+        }
+
+
+
+        // Log activity
+
+        function logActivity(type, date, bodyArea = 'Full Body') {
+
+            state.activityLog.unshift({ type, date, bodyArea });
+
+            if (state.activityLog.length > 10) {
+
+                state.activityLog.pop();
+
+            }
+
+        }
+
+
+
+        // Populate all stretches in library
+
+        function populateAllStretches() {
+
+            const container = document.getElementById('allStretchesContainer');
+
+            container.innerHTML = '';
+
+            
+
+            // Get all unique stretches from routines
+
+            const allStretches = {};
+
+            Object.values(routines).forEach(routine => {
+
+                routine.stretches.forEach(stretch => {
+
+                    if (!allStretches[stretch.name]) {
+
+                        allStretches[stretch.name] = stretch;
+
+                    }
+
+                });
+
+            });
+
+
+
+            // Create stretch cards
+
+            Object.values(allStretches).forEach(stretch => {
+
+                const stretchEl = document.createElement('div');
+
+                stretchEl.className = 'bg-white rounded-lg shadow p-3 border border-gray-100 cursor-pointer stretch-card';
+
+                stretchEl.innerHTML = `
+
+                    <div class="bg-indigo-100 w-10 h-10 rounded-full flex items-center justify-center mb-2 mx-auto">
+
+                        <i class="fas ${getBodyPartIconClass(stretch.bodyPart)} text-indigo-600"></i>
+
+                    </div>
+
+                    <p class="text-center font-medium text-sm">${stretch.name}</p>
+
+                    <p class="text-center text-xs text-gray-500">${stretch.duration}</p>
+
+                `;
+
+                stretchEl.setAttribute('data-stretch', JSON.stringify(stretch));
+
+                stretchEl.addEventListener('click', function() {
+
+                    openStretchModal(stretch);
+
+                });
+
+                container.appendChild(stretchEl);
+
+            });
+
+        }
+
+
+
+        // Open create routine modal
+
+        function openCreateRoutineModal() {
+
+            const container = document.getElementById('availableStretchesList');
+
+            container.innerHTML = '';
+
+            
+
+            // Get all unique stretches from routines
+
+            const allStretches = {};
+
+            Object.values(routines).forEach(routine => {
+
+                routine.stretches.forEach(stretch => {
+
+                    if (!allStretches[stretch.name]) {
+
+                        allStretches[stretch.name] = stretch;
+
+                    }
+
+                });
+
+            });
+
+
+
+            // Create checkboxes for each stretch
+
+            Object.values(allStretches).forEach(stretch => {
+
+                const stretchEl = document.createElement('div');
+
+                stretchEl.className = 'flex items-center mb-2';
+
+                stretchEl.innerHTML = `
+
+                    <input type="checkbox" id="stretch-${stretch.name}" class="mr-2" value='${JSON.stringify(stretch)}'>
+
+                    <label for="stretch-${stretch.name}" class="text-gray-700">${stretch.name} (${stretch.duration})</label>
+
+                `;
+
+                container.appendChild(stretchEl);
+
+            });
+
+
+
+            document.getElementById('createRoutineModal').classList.remove('hidden');
+
+        }
+
+
+
+        // Close create routine modal
+
+        function closeCreateRoutineModal() {
+
+            document.getElementById('createRoutineModal').classList.add('hidden');
+
+        }
+
+
+
+        // Open stretch modal
+
+        function openStretchModal(stretch) {
+
+            document.getElementById('stretchTitle').textContent = stretch.name;
+
+            document.getElementById('stretchDuration').textContent = stretch.duration;
+
+            document.getElementById('stretchVideo').src = `https://www.youtube.com/embed/${stretch.videoId}`;
+
+            document.getElementById('stretchInstructions').textContent = stretch.instructions;
+
+            document.getElementById('stretchBenefits').textContent = stretch.benefits;
+
+            document.getElementById('stretchModal').classList.remove('hidden');
+
+            
+
+            // Add close handler
+
+            document.getElementById('closeStretchModal').onclick = closeStretchModal;
+
+        }
+
+
+
+        // Close stretch modal
+
+        function closeStretchModal() {
+
+            document.getElementById('stretchModal').classList.add('hidden');
+
+        }
+
+
+
+        // Save new routine
+
+        function saveNewRoutine() {
+
+            const name = document.getElementById('routineNameInput').value.trim();
+
+            if (!name) {
+
+                alert('Please enter a routine name');
+
+                return;
+
+            }
+
+
+
+            const checkboxes = document.querySelectorAll('#availableStretchesList input[type="checkbox"]:checked');
+
+            if (checkboxes.length === 0) {
+
+                alert('Please select at least one stretch');
+
+                return;
+
+            }
+
+
+
+            const stretches = Array.from(checkboxes).map(cb => JSON.parse(cb.value));
+
+            
+
+            // Create new routine ID (simple slug for demo)
+
+            const routineId = name.toLowerCase().replace(/\s+/g, '-');
+
+            
+
+            // Add to routines
+
+            routines[routineId] = {
+
+                title: name,
+
+                duration: `${stretches.length * 2} minutes`, // Simple duration calculation
+
+                stretches: stretches
+
+            };
+
+
+
+            // Save and update UI
+
+            saveState();
+
+            closeCreateRoutineModal();
+
+            
+
+            // Add new routine to library display
+
+            const routinesList = document.getElementById('routinesList');
+
+            const routineEl = document.createElement('div');
+
+            routineEl.className = 'routine-card bg-white rounded-lg shadow-md p-4 border border-gray-100 cursor-pointer';
+
+            routineEl.setAttribute('data-routine', routineId);
+
+            routineEl.innerHTML = `
+
+                <div class="flex justify-between items-center">
+
+                    <div>
+
+                        <h4 class="font-bold text-indigo-700">${name}</h4>
+
+                        <p class="text-sm text-gray-600">${stretches.length} stretches • ${stretches.length * 2} minutes • Custom</p>
+
+                    </div>
+
+                    <i class="fas fa-chevron-right text-gray-400"></i>
+
+                </div>
+
+            `;
+
+            routinesList.appendChild(routineEl);
+
+            
+
+            // Add click handler
+
+            routineEl.addEventListener('click', function() {
+
+                openRoutineModal(routineId);
+
+            });
+
+            
+
+            updateUI();
+
+            
+
+            // Show success message
+
+            alert(`Routine "${name}" created successfully!`);
+
+        }
+
+
+
+        // Get icon class for body part
+
+        function getBodyPartIconClass(bodyPart) {
+
+            switch(bodyPart.toLowerCase()) {
+
+                case 'upper body': return 'fa-hands';
+
+                case 'lower body': return 'fa-walking';
+
+                case 'back': return 'fa-spa';
+
+                default: return 'fa-running';
+
+            }
+
+        }
+
+
+
+        // Save state to localStorage
+
+        function saveState() {
+
+            // Calculate stretch area focus
+
+            const bodyAreas = {
+
+                'Upper Body': 0,
+
+                'Lower Body': 0,
+
+                'Back': 0,
+
+                'Full Body': 0
+
+            };
+
+            
+
+            // Count body area occurrences in activity log
+
+            state.activityLog.forEach(activity => {
+
+                if (activity.bodyArea) {
+
+                    bodyAreas[activity.bodyArea]++;
+
+                }
+
+            });
+
+            
+
+            // Calculate percentages
+
+            const total = Object.values(bodyAreas).reduce((sum, count) => sum + count, 1); // Add 1 to prevent division by zero
+
+            state.stretchAreas = {
+
+                'Upper Body': Math.round((bodyAreas['Upper Body'] / total) * 100),
+
+                'Lower Body': Math.round((bodyAreas['Lower Body'] / total) * 100),
+
+                'Back': Math.round((bodyAreas['Back'] / total) * 100),
+
+                'Full Body': Math.round((bodyAreas['Full Body'] / total) * 100)
+
+            };
+
+            
+
+            localStorage.setItem('stretchWellState', JSON.stringify(state));
+
+            localStorage.setItem('stretchWellRoutines', JSON.stringify(routines));
+
+        }
+
+    </script>
+
+</body>
+
+</html>
